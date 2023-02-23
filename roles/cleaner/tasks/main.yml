@@ -12,7 +12,7 @@
   ansible.builtin.lineinfile:
     path: {{ sos_report }}   #use this var to determine where your file is. preferably in a survey for flexibility
     state: present
-    regexp: '(s/+)old.\.host.name\(\s=.*)?$' ####'hostname.*.*'gmi ###this keyword should be what you are looking for in the file to determine if you need to delete it
+    regexp: '(s/+)old\.host\.name\(\s+.*)?$' ####'hostname.*.*'gmi ###this keyword should be what you are looking for in the file to determine if you need to delete it
   register: lookup_var
 
 - name: replacing keywords
