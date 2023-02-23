@@ -3,23 +3,23 @@
 
 - name: looking for files
   stat: 
-    path: {{ dir_var }}
+    path: "{{ dir_var }}"
   register: directory
 
 
 
 - name: look up key words in file
   ansible.builtin.lineinfile:
-    path: {{ sos_report }}   #use this var to determine where your file is. preferably in a survey for flexibility
+    path: "{{ sos_report }}"   #use this var to determine where your file is. preferably in a survey for flexibility
     state: present
     regexp: '(s/+)old\.host\.name\(\s+.*)?$' ####'hostname.*.*'gmi ###this keyword should be what you are looking for in the file to determine if you need to delete it
   register: lookup_var
 
 - name: replacing keywords
   ansible.builtin.replace:
-    path:  {{ sos_report }}
+    path:  "{{ sos_report }}"
     regexp: "'.*th.*'gmi"
-    replace: '\1obfuscatedhost{{ server }}\2'   ### youre going to want to make this a survey or var 
+    replace: '\1obfuscatedhost\2'   ### youre going to want to make this a survey or var 
   when: lookup_var == true
 
 
