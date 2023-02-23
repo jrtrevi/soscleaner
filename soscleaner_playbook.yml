@@ -1,0 +1,11 @@
+---
+- name: cleaning sos reports
+  gather_facts: true
+  become: true
+  hosts: bastion
+
+
+- name: including other tasks
+  roles:
+    - cleaner
+
