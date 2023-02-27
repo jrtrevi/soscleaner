@@ -1,4 +1,4 @@
 ---
 # vars file for cleaner
-dir_var: '/home/jtrevino/sos-test'
-sos_report: '/home/jtrevino/sos-test/sosreport.txt'
+dir_var: /home/jtrevino/sos-test
+sos_report: /home/jtrevino/sos-test/sosreport.txt

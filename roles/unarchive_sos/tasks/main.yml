@@ -1,0 +1,8 @@
+---
+# tasks file for unarchive_sos
+#
+- name: unpack sos report
+  ansible.builtin.unarchive:
+    src: /var/tmp/sosreport-localhost-2023-02-23-duyhssv.tar.xz
+    dest: /home/jtrevino/sos-test
+  become: true

@@ -2,25 +2,48 @@
 # tasks file for cleaner
 
 - name: looking for files
-  stat: 
-    path: "{{ dir_var }}"
-  register: directory
+  ansible.builtin.find: 
+    path: "/home/jtrevino/sos-test/"
+    recurse: true
+  register: localhostfiles
 
 
 
-- name: look up key words in file
-  ansible.builtin.lineinfile:
-    path: "{{ sos_report }}"   #use this var to determine where your file is. preferably in a survey for flexibility
-    state: present
-    regexp: '(s/+)old\.host\.name\(\s+.*)?$' ####'hostname.*.*'gmi ###this keyword should be what you are looking for in the file to determine if you need to delete it
-  register: lookup_var
+  #- name: look up key words in file
+  #  ansible.builtin.lineinfile:
+  #    path: /home/jtrevino/sos-test/sosreport   #use this var to determine where your file is. preferably in a survey for flexibility
+  #  state: present
+  #  regexp: '(s/+)old\.host\.name\(\s+.*)?$' ####'hostname.*.*'gmi ###this keyword should be what you are looking for in the file to determine if you need to delete it
+  #  backrefs: true
+  #  register: lookup_var
 
 - name: replacing keywords
   ansible.builtin.replace:
-    path:  "{{ sos_report }}"
-    regexp: "'.*th.*'gmi"
+    path:  "{{ item.path }}"
+    regexp: '(\w)*localhost*(\w+.)?$'
     replace: '\1obfuscatedhost\2'   ### youre going to want to make this a survey or var 
-  when: lookup_var == true
+  with_items: "{{ localhostfiles.files }}"
+
+- name: replacing keywords
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '(\s+)*localhost*(\s+.*)?$'
+    replace: '\1obfuscatedhost\2' 
+  with_items: "{{ localhostfiles.files }}"
+
+
+- name: finding all dirs with localhost
+  ansible.builtin.find:
+    path: "/home/jtrevino/sos-test/"
+    recurse: true
+  register: directorynames
+
+- name: 
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "{{ item.path | replace("localhost", "obfuscatedhost") }}"
+  with_items: "{{ directorynames.path }}"
+
 
 
 

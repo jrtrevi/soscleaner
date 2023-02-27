@@ -1,11 +1,12 @@
 ---
 - name: cleaning sos reports
+  hosts: localhost
   gather_facts: true
   become: true
-  hosts: bastion
+  
 
 
-- name: including other tasks
-  roles:
-    - cleaner
+  tasks:
+          #- include: roles/unarchive_sos/tasks/main.yml
+   - include: roles/cleaner/tasks/main.yml
 
