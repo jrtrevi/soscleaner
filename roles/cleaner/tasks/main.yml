@@ -1,11 +1,13 @@
 ---
 # tasks file for cleaner
 
-- name: looking for files
-  ansible.builtin.find: 
-    path: "/home/jtrevino/sos-test/"
-    recurse: true
-  register: localhostfiles
+#- name: looking for files
+#  ansible.builtin.find: 
+#    path: "/home/jtrevino/sos-test/"
+#    recurse: true
+#    file_type: file
+#    hidden: rue
+#  register: localhostfiles
 
 
 
@@ -17,35 +19,64 @@
   #  backrefs: true
   #  register: lookup_var
 
-- name: replacing keywords
-  ansible.builtin.replace:
-    path:  "{{ item.path }}"
-    regexp: '(\w)*localhost*(\w+.)?$'
-    replace: '\1obfuscatedhost\2'   ### youre going to want to make this a survey or var 
-  with_items: "{{ localhostfiles.files }}"
+#- name: replacing keywords
+#  ansible.builtin.replace:
+#    path:  "{{ item.path }}"
+#    regexp: '(\w)*localhost*(\w+.)?$'
+#    replace: '\1obfuscatedhost\2'   ### youre going to want to make this a survey or var 
+#  with_items: "{{ localhostfiles.files }}"
 
-- name: replacing keywords
-  ansible.builtin.replace:
-    path: "{{ item.path }}"
-    regexp: '(\s+)*localhost*(\s+.*)?$'
-    replace: '\1obfuscatedhost\2' 
-  with_items: "{{ localhostfiles.files }}"
+#- name: replacing keywords
+#  ansible.builtin.replace:
+#    path: "{{ item.path }}"
+#    regexp: '(\s+)*localhost*(\s+.*)?$'
+#    replace: '\1obfuscatedhost\2' 
+#  with_items: "{{ localhostfiles.files }}"
 
 
 - name: finding all dirs with localhost
   ansible.builtin.find:
-    path: "/home/jtrevino/sos-test/"
+    path: "/home/jtrevino/sos-test-2/"
     recurse: true
+    file_type: any
+    hidden: true
+    patterns: 
+      - '(\s+)*localhost*(\s+.*)?$' 
+      - '(\w)*localhost*(\w+.)?$'
+    use_regex: true
   register: directorynames
+
+- name: blah
+  debug: 
+    var: directorynames 
+
+- name: blah2
+  debug: 
+    msg: "src:{{ item.path }} dest: {{ item.path | replace('localhost', 'obfuscatedhost') }}"
+  with_items: "{{ directorynames.files }}"
 
 - name: 
   ansible.builtin.copy:
     src: "{{ item.path }}"
-    dest: "{{ item.path | replace("localhost", "obfuscatedhost") }}"
-  with_items: "{{ directorynames.path }}"
+    dest: "{{ item.path | replace('localhost', 'obfuscatedhost') }}"
+  with_items: "{{ directorynames.files }}"
 
+- name: finding all dirs with localhost
+  ansible.builtin.find:
+    path: "/home/jtrevino/sos-test-2/"
+    recurse: true
+    file_type: any
+    hidden: true
+    patterns:
+      - '(\s+)*localhost*(\s+.*)?$'
+      - '(\w)*localhost*(\w+.)?$'
+    use_regex: true
+  register: remove_dir
 
-
-
-  
-  
+- name: removing all files with localhost
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+    force: true
+    recurse: true
+  with_items: "{{ remove_dir.files }}"
